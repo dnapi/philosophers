@@ -1,9 +1,11 @@
 NAME = philo
 
-SRC =	main.c\
-			atoil.c
+SRC =	main.c \
+			atoil.c \
+			ft_calloc.c
 
-FLAGS = -Wall -Wextra -Werror
+#FLAGS = -Wall -Wextra -Werror -pthread
+FLAGS = -pthread
 
 OBJ = $(SRC:.c=.o)
 

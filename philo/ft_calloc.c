@@ -1,0 +1,19 @@
+#include <stdlib.h>
+#include <string.h>
+
+void	*ft_calloc(size_t count, size_t size)
+{
+	void	*ptr;
+	size_t	num;
+	size_t	max;
+
+	max = (size_t)-1;
+	if (count > 0 && max / count < size)
+		return (NULL);
+	num = count * size;
+	ptr = (void *)malloc(num);
+	if (!ptr)
+		return (NULL);
+	memset(ptr, 0, num);
+	return (ptr);
+}

@@ -11,6 +11,11 @@ void* routine() {
         mails++;
         pthread_mutex_unlock(&mutex);
     }
+/*		int i;
+
+		i = 0;
+	return (&i);
+	*/
 }
 
 int main(int argc, char* argv[]) {

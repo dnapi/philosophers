@@ -8,7 +8,7 @@ int primes[10] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29 };
 void* routine(void* arg) {
     sleep(1);
     int index = *(int*)arg;
-    printf("%d ", primes[index]);
+    printf("my num=%d\n", primes[index]);
     free(arg);
 }
 
