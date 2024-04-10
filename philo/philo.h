@@ -1,8 +1,8 @@
 #ifndef PHILO_H
 # define PHILO_H
-#	include <stdio.h>
-#	include <stdlib.h>
-#	include <pthread.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <pthread.h>
 # include <sys/time.h>
 # include <unistd.h>
 # include <string.h>
@@ -22,28 +22,31 @@
 typedef struct s_args
 {
 	int	argc;
-	int num;
-	int die;
-  int eat;
-  int sleep;
-  int max_eat;
-}   t_args;
-
-typedef struct s_sage
-{
-	int			pos;
-	int			time_eat;
-} t_sage;
+	int	num;
+	int	die;
+	int	eat;
+	int	sleep;
+	int	max_eat;
+}	t_args;
 
 typedef struct s_table
 {
-	t_args 					*args;
-	pthread_mutex_t *sticks;
-	pthread_t				*sages;
-	t_sage					**guests;
-	int							*ind;
-	int							*pasta_flag;
+	t_args			*args;
+	pthread_mutex_t	*sticks;
+	pthread_t		*philos;
+	struct s_sage	**guests;
+	int				pasta_flag;
 }	t_table;
+
+typedef struct s_sage
+{
+	t_table	*table;
+	t_args	*args;
+	int		pos;
+	int		time_eat;
+	pthread_mutex_t	*left;
+	pthread_mutex_t	*right;
+}	t_sage;
 
 
 long	ft_atoil(const char *str);
