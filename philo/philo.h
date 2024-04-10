@@ -32,7 +32,10 @@ typedef struct s_args
 typedef struct s_table
 {
 	t_args			*args;
+	pthread_mutex_t	m_print;
+	pthread_mutex_t	m_gener;
 	pthread_mutex_t	*sticks;
+	pthread_mutex_t	*m_phils;
 	pthread_t		*philos;
 	struct s_sage	**guests;
 	int				pasta_flag;
@@ -44,6 +47,7 @@ typedef struct s_sage
 	t_args	*args;
 	int		pos;
 	int		time_eat;
+	pthread_mutex_t	m_phil;
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;
 }	t_sage;

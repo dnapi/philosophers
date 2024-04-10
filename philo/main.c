@@ -84,6 +84,7 @@ void	set_sticks(t_sage *sage)
 	sage->left = sage->table->sticks + left;
 	sage->right = sage->table->sticks + i;
 }
+
 void	*routine(void *arg)
 {
 	t_sage	*sage;
