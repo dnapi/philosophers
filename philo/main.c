@@ -98,8 +98,6 @@ void	*routine(void *arg)
 	return (arg);
 }
 
-
-
 void	clean_guests(t_sage **guests)
 {
 	int i;
@@ -140,8 +138,6 @@ void init_sage(t_sage *sage, t_table *table)
 }
 */
 
-
-
 int	init_guests(t_sage **guests, t_table *table)
 {
 	int	i;
@@ -177,13 +173,13 @@ int	init_table(t_table *table, t_args *args)
 {
 	set_table(table, args);
 	//table->sticks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * args->num);
-	table->sticks = malloc(sizeof(pthread_mutex_t) * args->num);
+	table->sticks = ft_calloc(args->num, sizeof(pthread_mutex_t));
 	if (!table->sticks)
 		return (clean_table_return(table, "malloc err for table->sticks", 1));
 	table->philos = (pthread_t *)malloc(sizeof(pthread_t) * args->num);
 	if (!table->philos)
 		return (clean_table_return(table, "malloc err for table->philos", 1));
-	table->guests = (t_sage **)ft_calloc(args->num + 1, sizeof(t_sage*));
+	table->guests = (t_sage **)ft_calloc(args->num + 1, sizeof(t_sage *));
 	if (!table->guests)
 		return (1);
 	if (init_guests(table->guests, table))
@@ -196,10 +192,8 @@ int	do_dinner(t_args *args)
 	t_table	table;
 	int		i;
 
-	printf("starting dinner...\n");
 	if (init_table(&table, args))
 		return (1);
-	printf("mutex init dinner...\n");
 	i = -1;
 	while (++i < args->num)
 		pthread_mutex_init(table.sticks + i, NULL);
@@ -209,7 +203,7 @@ int	do_dinner(t_args *args)
 	{
 		table.guests[i]->pos = i;
 		if (pthread_create(table.philos + i, \
-			NULL, &routine, table.guests[i]) != 0)
+				NULL, &routine, table.guests[i]) != 0)
 			return (1);
 		printf("thread i=%d has started\n", i);
 	}

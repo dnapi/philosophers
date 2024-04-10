@@ -1,11 +1,12 @@
 NAME = philo
 
 SRC =	main.c \
-			atoil.c \
-			ft_calloc.c
+		atoil.c \
+		ft_calloc.c \
+		time.c
 
 #FLAGS = -Wall -Wextra -Werror -pthread
-FLAGS = -pthread
+FLAGS = -pthread #--fsanitize=thread
 
 OBJ = $(SRC:.c=.o)
 

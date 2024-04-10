@@ -56,4 +56,7 @@ typedef struct s_sage
 long	ft_atoil(const char *str);
 void	*ft_calloc(size_t count, size_t size);
 
+int		ft_usleep(size_t milliseconds);
+size_t	get_current_time(void);
+
 #endif
