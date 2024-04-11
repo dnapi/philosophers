@@ -123,6 +123,11 @@ void	*routine(void *arg)
 
 	sage = (t_sage *)arg;
 
+	if (sage->pos == sage->args->num + 1)
+	{
+	//	do_monitoring(arg);
+		return (arg);
+	}
 	set_sticks(sage);
 	if (sage->pos % 2)
 	{
@@ -230,10 +235,12 @@ int	init_table(t_table *table, t_args *args)
 {
 	set_table(table, args);
 	//table->sticks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * args->num);
-	table->sticks = ft_calloc(args->num + NUM_EXTRA_MUTEX, sizeof(pthread_mutex_t));
+	table->sticks = ft_calloc(args->num + NUM_EXTRA_MUTEX, \
+													 sizeof(pthread_mutex_t));
 	if (!table->sticks)
 		return (clean_table_return(table, "malloc err for table->sticks", 1));
-	table->philos = (pthread_t *)malloc(sizeof(pthread_t) * args->num);
+	table->philos = (pthread_t *)malloc(sizeof(pthread_t) * \
+																		 (args->num + NUM_EXTRA_THREADS));
 	if (!table->philos)
 		return (clean_table_return(table, "malloc err for table->philos", 1));
 	table->guests = (t_sage **)ft_calloc(args->num + 1, sizeof(t_sage *));
@@ -258,7 +265,8 @@ int	do_dinner(t_args *args)
 	table.m_print = table.sticks + args->num;
 	table.m_gener = table.sticks + args->num + 1;
 	i = -1;
-	while (++i < args->num)
+//	printf("ok\n");
+	while (++i < args->num + NUM_EXTRA_THREADS)
 	{
 		table.guests[i]->pos = i + 1;
 		if (pthread_create(table.philos + i, \
@@ -266,8 +274,9 @@ int	do_dinner(t_args *args)
 			return (1);
 //		printf("thread i=%d has started\n", i);
 	}
+//	table.waiter = table.philos + args->num;
 	i = -1;
-	while (++i < args->num)
+	while (++i < args->num + NUM_EXTRA_THREADS)
 	{
 		if (pthread_join(table.philos[i], NULL) != 0)
 			return (2);
