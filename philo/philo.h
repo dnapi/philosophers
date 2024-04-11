@@ -16,8 +16,15 @@
 # define ERRMSG_TIMEEAT "time to eat must put positive"
 # define ERRMSG_TIMESLE "time to sleep must put positive"
 # define ERRMSG_MAXEAT "max number of eats must put positive or zero"
+# define LOG_FORK "has taken a fork"
+# define LOG_EAT "is eating"
+# define LOG_SLEEP "is sleeping"
+# define LOG_THINK "is thinking"
+# define LOG_DIED "died"
+
 
 # define DEBUG_MOD 1
+# define NUM_EXTRA_MUTEX 2
 
 typedef struct s_args
 {
@@ -32,13 +39,14 @@ typedef struct s_args
 typedef struct s_table
 {
 	t_args			*args;
-	pthread_mutex_t	m_print;
-	pthread_mutex_t	m_gener;
+	pthread_mutex_t	*m_print;
+	pthread_mutex_t	*m_gener;
 	pthread_mutex_t	*sticks;
 	pthread_mutex_t	*m_phils;
 	pthread_t		*philos;
 	struct s_sage	**guests;
 	int				pasta_flag;
+	int				num_eats;
 }	t_table;
 
 typedef struct s_sage
@@ -46,7 +54,8 @@ typedef struct s_sage
 	t_table	*table;
 	t_args	*args;
 	int		pos;
-	int		time_eat;
+	int		last_meal;
+	int		num_eats;
 	pthread_mutex_t	m_phil;
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;

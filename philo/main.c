@@ -76,7 +76,7 @@ void	set_sticks(t_sage *sage)
 	int	n;
 	int left;
 
-	i = sage->pos;
+	i = sage->pos - 1;
 	n = sage->args->num;
 	left = i + (i == 0) * n - 1;
 //	if (DEBUG_MOD)
@@ -85,16 +85,71 @@ void	set_sticks(t_sage *sage)
 	sage->right = sage->table->sticks + i;
 }
 
+void	printf_mut(t_sage *sage, char *str)
+{
+	pthread_mutex_lock(sage->table->m_print);
+	printf("%lu %d %s\n", get_current_time(), sage->pos, str);
+	pthread_mutex_unlock(sage->table->m_print);
+}
+
+int	read_num_eats(t_sage *sage)
+{
+	int	ret;
+
+	if (sage->args->argc == 5)
+		return (1);
+	pthread_mutex_lock(sage->table->m_gener);
+	ret = sage->table->num_eats;
+	pthread_mutex_unlock(sage->table->m_gener);
+//	printf("read_num_eats for %d, ret =%d\n", sage->pos,  ret);
+	return (ret);
+}
+
+void	reduce_num_eats(t_sage *sage)
+{
+	if (sage->num_eats <= 0)
+		return ;
+	pthread_mutex_lock(sage->table->m_gener);
+	sage->table->num_eats--;
+	pthread_mutex_unlock(sage->table->m_gener);
+//	printf("reduce_num_eats for %d\n", sage->pos);
+	sage->num_eats--;
+}
+
 void	*routine(void *arg)
 {
 	t_sage	*sage;
+	int	i;
 
 	sage = (t_sage *)arg;
+
 	set_sticks(sage);
-	pthread_mutex_lock(sage->right);
-	sleep(1);
-	printf("Hi my index is %d\n", sage->pos);
-	pthread_mutex_unlock(sage->right);
+	if (sage->pos % 2)
+	{
+//		printf("odd position\n");
+		ft_usleep(1);
+	}
+	i = -1;
+	while (read_num_eats(sage))
+	{
+		pthread_mutex_lock(sage->right);
+		printf_mut(sage, LOG_FORK);
+		pthread_mutex_lock(sage->left);
+		printf_mut(sage, LOG_FORK);
+		printf_mut(sage, LOG_EAT);
+		sage->last_meal = get_current_time();
+		ft_usleep(sage->args->eat);
+		reduce_num_eats(sage);
+		pthread_mutex_unlock(sage->right);
+		pthread_mutex_unlock(sage->left);
+		if (!read_num_eats(sage))
+			break ;
+		printf_mut(sage, LOG_SLEEP);
+		ft_usleep(sage->args->sleep);
+		if (!read_num_eats(sage))
+			break ;
+		printf_mut(sage, LOG_THINK);
+	}
 	return (arg);
 }
 
@@ -153,6 +208,7 @@ int	init_guests(t_sage **guests, t_table *table)
 			return (1);
 		}
 		guests[i]->pos = 0;
+		guests[i]->num_eats = table->args->max_eat;
 		guests[i]->table = table;
 		guests[i]->args = table->args;
 	}
@@ -164,6 +220,7 @@ void	set_table(t_table *table, t_args *args)
 {
 	table->args = args;
 	table->pasta_flag = 1;
+	table->num_eats = table->args->max_eat * table->args->num;
 	table->sticks = NULL;
 	table->philos = NULL;
 	table->guests = NULL;
@@ -173,7 +230,7 @@ int	init_table(t_table *table, t_args *args)
 {
 	set_table(table, args);
 	//table->sticks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * args->num);
-	table->sticks = ft_calloc(args->num, sizeof(pthread_mutex_t));
+	table->sticks = ft_calloc(args->num + NUM_EXTRA_MUTEX, sizeof(pthread_mutex_t));
 	if (!table->sticks)
 		return (clean_table_return(table, "malloc err for table->sticks", 1));
 	table->philos = (pthread_t *)malloc(sizeof(pthread_t) * args->num);
@@ -195,17 +252,19 @@ int	do_dinner(t_args *args)
 	if (init_table(&table, args))
 		return (1);
 	i = -1;
-	while (++i < args->num)
+	while (++i < args->num + NUM_EXTRA_MUTEX)
 		pthread_mutex_init(table.sticks + i, NULL);
 	//error check for mutex init
+	table.m_print = table.sticks + args->num;
+	table.m_gener = table.sticks + args->num + 1;
 	i = -1;
 	while (++i < args->num)
 	{
-		table.guests[i]->pos = i;
+		table.guests[i]->pos = i + 1;
 		if (pthread_create(table.philos + i, \
 				NULL, &routine, table.guests[i]) != 0)
 			return (1);
-		printf("thread i=%d has started\n", i);
+//		printf("thread i=%d has started\n", i);
 	}
 	i = -1;
 	while (++i < args->num)
@@ -214,7 +273,7 @@ int	do_dinner(t_args *args)
 			return (2);
 	}
 	i = -1;
-	while (++i < args->num)
+	while (++i < args->num + NUM_EXTRA_MUTEX)
 		pthread_mutex_destroy(table.sticks + i);
 	//error check for mutex destroy
 	clean_table_return(&table, NULL, 0);
