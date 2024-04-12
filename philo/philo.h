@@ -25,7 +25,7 @@
 
 # define DEBUG_MOD 1
 # define NUM_EXTRA_MUTEX 2
-# define NUM_EXTRA_THREADS 0
+# define NUM_EXTRA_THREADS 1
 
 typedef struct s_args
 {
@@ -56,7 +56,7 @@ typedef struct s_sage
 	t_table	*table;
 	t_args	*args;
 	int		pos;
-	int		last_meal;
+	size_t		last_meal;
 	int		num_eats;
 	pthread_mutex_t	m_phil;
 	pthread_mutex_t	*left;
