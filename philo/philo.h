@@ -15,7 +15,7 @@
 # define ERRMSG_TIMEDIE "time to die must put positive"
 # define ERRMSG_TIMEEAT "time to eat must put positive"
 # define ERRMSG_TIMESLE "time to sleep must put positive"
-# define ERRMSG_MAXEAT "max number of eats must put positive or zero"
+# define ERRMSG_MAXEAT "max number of eats must put positive"
 # define LOG_FORK "has taken a fork"
 # define LOG_EAT "is eating"
 # define LOG_SLEEP "is sleeping"
@@ -44,6 +44,7 @@ typedef struct s_table
 	pthread_mutex_t	*m_print;
 	pthread_mutex_t	*m_gener;
 	pthread_mutex_t	*sticks;
+	int							*forks;
 	pthread_mutex_t	*m_phils;
 	pthread_t		*philos;
 	pthread_t		*waiter;
