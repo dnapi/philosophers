@@ -23,7 +23,7 @@
 # define LOG_DIED "died"
 
 
-# define DEBUG_MOD 1
+# define DEBUG_MOD 0
 # define NUM_EXTRA_MUTEX 2
 # define NUM_EXTRA_THREADS 1
 
@@ -35,6 +35,7 @@ typedef struct s_args
 	int	eat;
 	int	sleep;
 	int	max_eat;
+	struct s_table	*table;
 }	t_args;
 
 typedef struct s_table
