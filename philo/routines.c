@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:10:18 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 06:50:03 by alex             ###   ########.fr       */
+/*   Updated: 2024/04/14 07:13:58 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,8 @@ int	set_flags(t_table *tab)
 			pasta_flag = 0;
 			printf("%lu %d %s\n", get_current_time(),
 				tab->guests[i]->pos, LOG_DIED);
+			if (DEBUG_MOD)
+				printf("duration=%lu\n", get_current_time() - tab->start_time);
 			break ;
 		}
 	}

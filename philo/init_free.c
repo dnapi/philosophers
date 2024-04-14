@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:08:25 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 06:53:21 by alex             ###   ########.fr       */
+/*   Updated: 2024/04/14 07:08:37 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ void	set_table(t_table *table, t_args *args)
 	table->args = args;
 	table->pasta_flag = 1;
 	table->num_eats = table->args->max_eat * table->args->num;
+	table->start_time = get_current_time();
 	table->sticks = NULL;
 	table->forks = NULL;
 	table->philos = NULL;

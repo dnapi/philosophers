@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:38:28 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 06:43:28 by alex             ###   ########.fr       */
+/*   Updated: 2024/04/14 07:12:54 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 # define LOG_THINK "is thinking"
 # define LOG_DIED "died"
 
-# define DEBUG_MOD 0
+# define DEBUG_MOD 1
 # define NUM_EXTRA_MUTEX 2
 # define NUM_EXTRA_THREADS 1
 
@@ -62,6 +62,7 @@ typedef struct s_table
 	struct s_sage	**guests;
 	int				pasta_flag;
 	int				num_eats;
+	size_t			start_time;
 }	t_table;
 
 typedef struct s_sage
