@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apimikov <apimikov@student.hive.fi>        +#+  +:+       +#+        */
+/*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:14:56 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 06:14:57 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/14 12:42:14 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	continue_dinner(t_table *table)
 	return (1);
 }
 
-void	printf_mut(t_sage *sage, char *str)
+void	printf_sem(t_sage *sage, char *str)
 {
 	pthread_mutex_lock(sage->table->m_print);
 	if (continue_dinner(sage->table))

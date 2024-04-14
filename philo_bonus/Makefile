@@ -1,9 +1,9 @@
 NAME = philo_bonus
 
-SRC =	main.c \
-		atoil.c \
-		ft_calloc.c \
-		time.c
+SRC =	main_bonus.c \
+		atoil_bonus.c \
+		ft_calloc_bonus.c \
+		time_bonus.c
 
 #FLAGS = -Wall -Wextra -Werror -pthread
 FLAGS = -pthread #-fsanitize=thread

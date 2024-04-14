@@ -103,7 +103,7 @@ int	continue_dinner(t_table *table)
 	return (1);
 }
 
-void	printf_mut(t_sage *sage, char *str)
+void	printf_sem(t_sage *sage, char *str)
 {
 	pthread_mutex_lock(sage->table->m_print);
 	if (continue_dinner(sage->table))
@@ -156,16 +156,16 @@ int	take_meal(t_sage *sage)
 {
 	//pthread_mutex_lock(sage->right);
 	lock_right(sage);
-	printf_mut(sage, LOG_FORK);
+	printf_sem(sage, LOG_FORK);
 	if (sage->args->num >1)
 	{
 		lock_left(sage);
 //		pthread_mutex_lock(sage->left);
-		printf_mut(sage, LOG_FORK);
+		printf_sem(sage, LOG_FORK);
 	}
 	else 
 		return (1);
-	printf_mut(sage, LOG_EAT);
+	printf_sem(sage, LOG_EAT);
 	set_last_meal(sage);
 	ft_usleep(sage->args->eat);
 	reduce_num_eats(sage);
@@ -204,11 +204,11 @@ void	*routine(void *arg)
 	{
 		if (take_meal(sage) || continue_dinner(sage->table) == 0)
 			break ;
-		printf_mut(sage, LOG_SLEEP);
+		printf_sem(sage, LOG_SLEEP);
 		ft_usleep(sage->args->sleep);
 		if (!continue_dinner(sage->table))
 			break ;
-		printf_mut(sage, LOG_THINK);
+		printf_sem(sage, LOG_THINK);
 	}
 	return (arg);
 }

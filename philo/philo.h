@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:38:28 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 07:12:54 by alex             ###   ########.fr       */
+/*   Updated: 2024/04/14 12:42:14 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ typedef struct s_table
 	pthread_mutex_t	*m_gener;
 	pthread_mutex_t	*sticks;
 	int				*forks;
-	pthread_mutex_t	*m_phils;
+//	pthread_mutex_t	*m_phils;
 	pthread_t		*philos;
 	pthread_t		*waiter;
 	struct s_sage	**guests;
@@ -72,7 +72,7 @@ typedef struct s_sage
 	int				pos;
 	size_t			last_meal;
 	int				num_eats;
-	pthread_mutex_t	m_phil;
+//	pthread_mutex_t	m_phil;
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;
 }	t_sage;
@@ -94,7 +94,7 @@ void	print_debug_mode(int flag, t_args *args);
 void	reduce_num_eats(t_sage *sage);
 void	set_last_meal(t_sage *sage);
 int		continue_dinner(t_table *table);
-void	printf_mut(t_sage *sage, char *str);
+void	printf_sem(t_sage *sage, char *str);
 
 //		lockers.c
 void	lock_right(t_sage *sage);

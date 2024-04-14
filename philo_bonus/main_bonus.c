@@ -1,4 +1,4 @@
-#include "philo.h"
+#include "philo_bonus.h"
 
 // set_args.c
 int	panic_args(char *msg, int return_value)
@@ -72,7 +72,7 @@ void print_debug_mode(int flag, t_args *args)
 }
 
 
-
+/*
 // routine_utils.c
 void	reduce_num_eats(t_sage *sage)
 {
@@ -103,13 +103,6 @@ int	continue_dinner(t_table *table)
 	return (1);
 }
 
-void	printf_mut(t_sage *sage, char *str)
-{
-	pthread_mutex_lock(sage->table->m_print);
-	if (continue_dinner(sage->table))
-		printf("%lu %d %s\n", get_current_time(), sage->pos, str);
-	pthread_mutex_unlock(sage->table->m_print);
-}
 
 
 // lockers.c
@@ -152,6 +145,19 @@ void	unlock_left(t_sage *sage)
 
 
 //routines.c
+void	set_sticks(t_sage *sage)
+{
+	int	i;
+	int	n;
+	int left;
+
+	i = sage->pos - 1;
+	n = sage->args->num;
+	left = i + (i == 0) * n - 1;
+	sage->left = sage->table->sticks + left;
+	sage->right = sage->table->sticks + i;
+}
+
 int	take_meal(t_sage *sage)
 {
 	//pthread_mutex_lock(sage->right);
@@ -177,42 +183,86 @@ int	take_meal(t_sage *sage)
 	return (0);
 }
 
-void	set_sticks(t_sage *sage)
-{
-	int	i;
-	int	n;
-	int left;
 
-	i = sage->pos - 1;
-	n = sage->args->num;
-	left = i + (i == 0) * n - 1;
-	sage->left = sage->table->sticks + left;
-	sage->right = sage->table->sticks + i;
+*/
+
+int print_return(char *msg, int ret)
+{
+	if (msg && *msg)
+		printf("%s: %s\n", MSG_NAME, msg);
+	return (ret);
 }
 
-void	*routine(void *arg)
+int	printf_sem(t_sage *sage, char *str)
+{
+//	if (sem_wait(sage->table->print) < 0)
+//		return (print_return("Error: sem_wait", EXIT_FAIL));
+	if (1) //continue_dinner(sage->table))
+		printf("%lu %d %s\n", get_current_time(), sage->pos, str);
+	//if (sem_post(sage->table->print) < 0)
+	//	return (print_return("Error: sem_post", EXIT_FAIL));
+	return (0);
+}
+
+
+
+
+int take_meal(t_sage *sage)
+{
+	if (sem_wait(sage->table->sticks) < 0)
+		exit(print_return("Error: sem_wait", EXIT_FAIL));
+	printf_sem(sage, LOG_FORK);
+	if (sage->args->num > 1)
+	{
+		if (sem_wait(sage->table->sticks) < 0)
+			exit(print_return("Error: sem_wait", EXIT_FAIL));
+		printf_sem(sage, LOG_FORK);
+	}
+	else
+		return (1);
+	printf_sem(sage, LOG_EAT);
+	//set_last_meal(sage);
+	//ft_usleep(sage->args->eat);
+	if (sem_post(sage->table->sticks) < 0 || sem_post(sage->table->sticks) < 0) 
+	{
+		perror("sem_post");
+		exit(EXIT_FAIL);
+	}
+	printf("Child %d started\n", sage->pos);
+	return (0);
+}
+
+int	routine(void *arg)
 {
 	t_sage	*sage;
 	int	i;
 
+	//printf("starting routine \n");
 	sage = (t_sage *)arg;
-	set_sticks(sage);
-	if (sage->pos % 2)
-		ft_usleep(1);
+	//ft_usleep(sage->pos);
+//	if (DEBUG_MOD)
+//		printf("Hi! I am %d\n", sage->pos);
+	//set_sticks(sage);
+//	if (sage->pos % 2)
+//		ft_usleep(1);
+//	exit(EXIT_SUCCESS);
+
 	i = -1;
-	while (continue_dinner(sage->table))
+	while (++i < 5) //continue_dinner(sage->table))
 	{
-		if (take_meal(sage) || continue_dinner(sage->table) == 0)
+		take_meal(sage);
+/*		if (take_meal(sage) || continue_dinner(sage->table) == 0)
 			break ;
 		printf_mut(sage, LOG_SLEEP);
 		ft_usleep(sage->args->sleep);
 		if (!continue_dinner(sage->table))
 			break ;
 		printf_mut(sage, LOG_THINK);
+*/
 	}
-	return (arg);
 }
 
+/*
 int	set_flags(t_table *tab)
 {
 	int		pasta_flag;
@@ -236,14 +286,18 @@ int	set_flags(t_table *tab)
 	}
 	return (pasta_flag);
 }
+*/
 
-void	*monitor(void *arg)
+int	monitor(void *arg)
 {
 	t_table	*tab;
 	int		pasta_flag;
 
 	tab = (t_table *)arg;
 	pasta_flag = 1;
+	if (DEBUG_MOD)
+		printf("Hi! I am waiter\n");
+	/*
 	while (tab->num_eats)
 	{
 		pthread_mutex_lock(tab->m_print);
@@ -255,10 +309,9 @@ void	*monitor(void *arg)
 			break ;
 		ft_usleep(1);
 	}
-	return (arg);
+	*/
+	return (0);
 }
-
-
 
 // init_free.c
 void	clean_guests(t_sage **guests)
@@ -280,12 +333,6 @@ int clean_table_return(t_table *table, char *msg, int ret)
 {
 	if (!table)
 		return (ret);
-	if (table->sticks)
-		free(table->sticks);
-	table->sticks = NULL;
-	if (table->forks)
-		free(table->forks);
-	table->forks = NULL;
 	if (table->philos)
 		free(table->philos);
 	table->philos = NULL;
@@ -328,7 +375,8 @@ void	set_table(t_table *table, t_args *args)
 	table->pasta_flag = 1;
 	table->num_eats = table->args->max_eat * table->args->num;
 	table->sticks = NULL;
-	table->forks = NULL;
+	table->print = NULL;
+	table->gener = NULL;
 	table->philos = NULL;
 	table->guests = NULL;
 }
@@ -336,15 +384,8 @@ void	set_table(t_table *table, t_args *args)
 int	init_table(t_table *table, t_args *args)
 {
 	set_table(table, args);
-	table->sticks = ft_calloc(args->num + NUM_EXTRA_MUTEX, \
-					sizeof(pthread_mutex_t));
-	if (!table->sticks)
-		return (clean_table_return(table, "malloc err for table->sticks", 1));
-	table->forks = ft_calloc(args->num, sizeof(int));
-	if (!table->forks)
-		return (clean_table_return(table, "malloc err for table->fork", 1));
-	table->philos = (pthread_t *)malloc(sizeof(pthread_t) * \
-				(args->num + NUM_EXTRA_THREADS));
+	table->philos = (pid_t *)malloc(sizeof(pid_t) * \
+				(args->num + NUM_EXTRA_PROC));
 	if (!table->philos)
 		return (clean_table_return(table, "malloc err for table->philos", 1));
 	table->waiter = table->philos + args->num;
@@ -352,15 +393,40 @@ int	init_table(t_table *table, t_args *args)
 	if (!table->guests)
 		return (1);
 	if (init_guests(table->guests, table))
-		return (clean_table_return(table, "malloc err  in init_guests", 1));
+		return (clean_table_return(table, "malloc err in init_guests", 1));
+	if (DEBUG_MOD)
+		printf("table is initialized\n");
 	return (0);
 }
 
 
 // main.c
 
-int	make_threads(t_args *args, t_table *table)
+int	make_processes(t_args *args, t_table *table)
 {
+	int	i;
+	int status;
+
+	i = -1;
+	while (++i < args->num)
+	{
+		printf("i=%d\n", i);
+		table->guests[i]->pos = i + 1;
+		table->philos[i] = fork();
+		if (table->philos[i] < 0)
+			exit(clean_table_return(table, "fork error", 1));
+		else if (i < args->num && table->philos[i] == 0)
+			routine(table->guests[i]);
+	}
+	if (DEBUG_MOD)
+		printf("Philosophers are now in the process\n");
+	monitor(table);
+	while (++i < args->num + 1)
+		waitpid(table->philos[i], &status, 0);
+	printf("main proccess is after waitpid\n");
+	return ((status & 0xff00) >> 8);
+}
+/*{
 	int	i;
 
 	i = -1;
@@ -381,25 +447,24 @@ int	make_threads(t_args *args, t_table *table)
 	}
 	return (0);
 }
-
-/*
-	i = -1;
-	while (++i < args->num)
-	{
-		table.guests[i]->pos = i + 1;
-		if (pthread_create(table.philos + i, \
-				NULL, &routine, table.guests[i]) != 0)
-			return (clean_table_return(&table, "error pthread_create", 1));
-	}
-	if (pthread_create(table.waiter, NULL, &monitor, &table) != 0)
-		return (clean_table_return(&table, "error pthread_create", 1));
-	i = -1;
-	while (++i < args->num + NUM_EXTRA_THREADS)
-	{
-		if (pthread_join(table.philos[i], NULL) != 0)
-			return (clean_table_return(&table, "error pthread_join", 1));
-	}
 */
+
+int open_semaphores(t_table *table, t_args *args)
+{
+	table->sticks = sem_open("sticks", O_CREAT, 0644, args->num);
+	if (table->sticks == SEM_FAILED)
+		return (clean_table_return(table, "error sem_open", 1));
+	table->print = sem_open("print", O_CREAT, 0644, 1);
+	if (table->print == SEM_FAILED)
+		return (clean_table_return(table, "error sem_open", 1));
+	table->gener = sem_open("gener", O_CREAT, 0644, 1);
+	if (table->gener == SEM_FAILED)
+		return (clean_table_return(table, "error sem_open", 1));
+	if (DEBUG_MOD)
+		printf("semaphores are open\n");
+	return (0);
+}
+
 int	do_dinner(t_args *args)
 {
 	t_table	table;
@@ -407,22 +472,18 @@ int	do_dinner(t_args *args)
 
 	if (init_table(&table, args))
 		return (1);
-	i = -1;
-	while (++i < args->num + NUM_EXTRA_MUTEX)
-	{
-		if (pthread_mutex_init(table.sticks + i, NULL) == -1)
-			return (clean_table_return(&table, "error pthread_mutex_init", 1));
-	}
-	table.m_print = table.sticks + args->num;
-	table.m_gener = table.sticks + args->num + 1;
-	if (make_threads(args, &table))
+	if (open_semaphores(&table, args))
 		return (1);
+	if (make_processes(args, &table))
+		return (1);
+	/*
 	i = -1;
 	while (++i < args->num + NUM_EXTRA_MUTEX)
 	{
 		if (pthread_mutex_destroy(table.sticks + i) == -1)
 			return (clean_table_return(&table, "error pthread_mutex_destroy", 1));
 	}
+	*/
 	clean_table_return(&table, NULL, 0);
 	return (0);
 }
