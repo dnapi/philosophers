@@ -3,7 +3,12 @@ NAME = philo
 SRC =	main.c \
 		atoil.c \
 		ft_calloc.c \
-		time.c
+		time.c \
+		set_args.c \
+		routines_utils.c \
+		lockers.c \
+		routines.c \
+		init_free.c
 
 #FLAGS = -Wall -Wextra -Werror -pthread
 FLAGS = -pthread #-fsanitize=thread
