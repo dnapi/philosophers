@@ -20,6 +20,7 @@
 # include <string.h>
 # include <sys/wait.h>
 # include <semaphore.h>
+# include <fcntl.h>
 
 # define MSG_NAME "phil"
 # define ERRMSG_NUMARG "wrong number of arguments"
@@ -41,6 +42,10 @@
 # define DEBUG_MOD 1
 # define NUM_EXTRA_SEM 2
 # define NUM_EXTRA_PROC 1
+
+# define SEM_STICKS "/sticks"
+# define SEM_PRINT  "/print"
+# define SEM_GENER 	"/gener"
 
 typedef struct s_args
 {

@@ -53,13 +53,11 @@ void	set_sticks(t_sage *sage)
 void	*routine(void *arg)
 {
 	t_sage	*sage;
-	int		i;
 
 	sage = (t_sage *)arg;
 	set_sticks(sage);
 	if (sage->pos % 2)
 		ft_usleep(1);
-	i = -1;
 	while (continue_dinner(sage->table))
 	{
 		if (take_meal(sage) || continue_dinner(sage->table) == 0)

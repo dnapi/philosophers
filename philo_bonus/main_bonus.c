@@ -1,4 +1,5 @@
 #include "philo_bonus.h"
+#include <semaphore.h>
 
 // set_args.c
 int	panic_args(char *msg, int return_value)
@@ -195,12 +196,12 @@ int print_return(char *msg, int ret)
 
 int	printf_sem(t_sage *sage, char *str)
 {
-//	if (sem_wait(sage->table->print) < 0)
-//		return (print_return("Error: sem_wait", EXIT_FAIL));
+	if (sem_wait(sage->table->print) < 0)
+		return (print_return("Error: sem_wait", EXIT_FAIL));
 	if (1) //continue_dinner(sage->table))
 		printf("%lu %d %s\n", get_current_time(), sage->pos, str);
-	//if (sem_post(sage->table->print) < 0)
-	//	return (print_return("Error: sem_post", EXIT_FAIL));
+	if (sem_post(sage->table->print) < 0)
+		return (print_return("Error: sem_post", EXIT_FAIL));
 	return (0);
 }
 
@@ -209,6 +210,8 @@ int	printf_sem(t_sage *sage, char *str)
 
 int take_meal(t_sage *sage)
 {
+	ft_usleep(sage->pos);
+//	printf("taking meal %d\n", sage->pos); //remove me
 	if (sem_wait(sage->table->sticks) < 0)
 		exit(print_return("Error: sem_wait", EXIT_FAIL));
 	printf_sem(sage, LOG_FORK);
@@ -219,16 +222,16 @@ int take_meal(t_sage *sage)
 		printf_sem(sage, LOG_FORK);
 	}
 	else
-		return (1);
+		exit (1);
 	printf_sem(sage, LOG_EAT);
 	//set_last_meal(sage);
 	//ft_usleep(sage->args->eat);
-	if (sem_post(sage->table->sticks) < 0 || sem_post(sage->table->sticks) < 0) 
+	if (sem_post(sage->table->sticks) < 0)// || sem_post(sage->table->sticks) < 0) 
 	{
-		perror("sem_post");
+		printf("sem_post");
 		exit(EXIT_FAIL);
 	}
-	printf("Child %d started\n", sage->pos);
+	printf("End of takeing meal %d\n", sage->pos);
 	return (0);
 }
 
@@ -260,6 +263,7 @@ int	routine(void *arg)
 		printf_mut(sage, LOG_THINK);
 */
 	}
+	exit (EXIT_SUCCESS);
 }
 
 /*
@@ -290,11 +294,12 @@ int	set_flags(t_table *tab)
 
 int	monitor(void *arg)
 {
-	t_table	*tab;
-	int		pasta_flag;
+	//t_table	*tab;
+	//int		pasta_flag;
 
-	tab = (t_table *)arg;
-	pasta_flag = 1;
+	(void)arg;
+	//tab = (t_table *)arg;
+	//pasta_flag = 1;
 	if (DEBUG_MOD)
 		printf("Hi! I am waiter\n");
 	/*
@@ -421,7 +426,8 @@ int	make_processes(t_args *args, t_table *table)
 	if (DEBUG_MOD)
 		printf("Philosophers are now in the process\n");
 	monitor(table);
-	while (++i < args->num + 1)
+	i = -1;
+	while (++i < args->num)
 		waitpid(table->philos[i], &status, 0);
 	printf("main proccess is after waitpid\n");
 	return ((status & 0xff00) >> 8);
@@ -451,17 +457,45 @@ int	make_processes(t_args *args, t_table *table)
 
 int open_semaphores(t_table *table, t_args *args)
 {
-	table->sticks = sem_open("sticks", O_CREAT, 0644, args->num);
+//	printf("args->num=%d\n", args->num); //remove me
+	(void)args;
+	table->sticks = sem_open(SEM_STICKS, O_CREAT, 0644, 10);// (unsigned int) args->num);
 	if (table->sticks == SEM_FAILED)
+	{
+		printf("sem errror \n");//remove me
 		return (clean_table_return(table, "error sem_open", 1));
-	table->print = sem_open("print", O_CREAT, 0644, 1);
+	}
+	//
+	if (sem_trywait(table->sticks) == -1)
+		printf("After open semaphore. It is closed\n");
+	else
+		printf("After open semaphore. It is open\n");
+	//
+	table->print = sem_open(SEM_PRINT, O_CREAT, 0644, 1);
 	if (table->print == SEM_FAILED)
 		return (clean_table_return(table, "error sem_open", 1));
-	table->gener = sem_open("gener", O_CREAT, 0644, 1);
+	table->gener = sem_open(SEM_GENER, O_CREAT, 0644, 1);
 	if (table->gener == SEM_FAILED)
 		return (clean_table_return(table, "error sem_open", 1));
 	if (DEBUG_MOD)
 		printf("semaphores are open\n");
+	return (0);
+}
+
+int close_semaphores(t_table *table)
+{
+	if ( \
+		sem_close(table->sticks) < 0 || \
+		sem_close(table->print) || \
+		sem_close(table->gener))
+		return (clean_table_return(table, "error sem_close", 1));
+	if ( \
+		sem_unlink(SEM_STICKS) < 0 || \
+		sem_unlink(SEM_PRINT) || \
+		sem_unlink(SEM_GENER))
+		return (clean_table_return(table, "error sem_unlink", 1));
+	if (DEBUG_MOD)
+		printf("semaphores are closed and unlinked\n");
 	return (0);
 }
 
@@ -470,6 +504,7 @@ int	do_dinner(t_args *args)
 	t_table	table;
 	int		i;
 
+	(void)i;
 	if (init_table(&table, args))
 		return (1);
 	if (open_semaphores(&table, args))
@@ -484,6 +519,8 @@ int	do_dinner(t_args *args)
 			return (clean_table_return(&table, "error pthread_mutex_destroy", 1));
 	}
 	*/
+	if (close_semaphores(&table))
+		return (1);
 	clean_table_return(&table, NULL, 0);
 	return (0);
 }

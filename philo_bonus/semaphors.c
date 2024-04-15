@@ -4,10 +4,12 @@
 //#include <sys/types.h>
 #include <sys/wait.h>
 #include <semaphore.h>
-//#include <fcntl.h>
+#include <fcntl.h>
 
-#define NUM_CHILDREN 10
-#define MAX_SEM_COUNT 10
+#define NUM_CHILDREN 5
+#define MAX_SEM_COUNT 5
+
+#define EXIT_FAIL 2
 
 
 
@@ -18,6 +20,10 @@ int main() {
         perror("sem_open");
         exit(EXIT_FAIL);
     }
+		if (sem_trywait(sem) == -1)
+			printf("semaphore is closed\n");
+		else
+			printf("semaphore is not closed after sem_open\n");
 
     // Fork multiple child processes
     for (int i = 0; i < NUM_CHILDREN; i++) {
