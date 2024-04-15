@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:38:28 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 12:42:14 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/15 11:51:23 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 # define LOG_THINK "is thinking"
 # define LOG_DIED "died"
 
-# define DEBUG_MOD 1
+# define DEBUG_MOD 0
 # define NUM_EXTRA_MUTEX 2
 # define NUM_EXTRA_THREADS 1
 

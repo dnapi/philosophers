@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:38:28 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 13:01:33 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/15 17:16:52 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,12 +36,11 @@
 # define LOG_THINK "is thinking"
 # define LOG_DIED "died"
 
-
 # define EXIT_FAIL 2
 
 # define DEBUG_MOD 1
+# define SEM_MOD 0
 # define NUM_EXTRA_SEM 2
-# define NUM_EXTRA_PROC 1
 
 # define SEM_STICKS "/sticks"
 # define SEM_PRINT  "/print"
@@ -64,9 +63,10 @@ typedef struct s_table
 	sem_t			*print;
 	sem_t			*gener;
 	sem_t			*sticks;
+	sem_t			*meals;
+	//sem_t			**sems;
 	int				*forks;
 	pid_t			*philos;
-	pid_t			*waiter;
 	struct s_sage	**guests;
 	int				pasta_flag;
 	int				num_eats;
@@ -75,11 +75,13 @@ typedef struct s_table
 
 typedef struct s_sage
 {
-	t_table	*table;
-	t_args	*args;
-	int		pos;
-	size_t	last_meal;
-	int		num_eats;
+	t_table		*table;
+	t_args		*args;
+	int			pos;
+	pthread_t	ghost;
+	//sem_t		*sem;
+	size_t		last_meal;
+	int			num_eats;
 	//sem_t	*left;
 }	t_sage;
 
@@ -110,7 +112,7 @@ void	unlock_left(t_sage *sage);
 
 //		routines.c
 int		routine(void *arg);
-int		monitor(void *arg);
+void	*monitor(void *arg);
 
 //		init_free.c
 void	clean_guests(t_sage **guests);
