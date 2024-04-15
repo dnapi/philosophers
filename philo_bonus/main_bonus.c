@@ -270,7 +270,12 @@ int	make_thread(t_sage *sage)
 int take_meal(t_sage *sage)
 {
 	if (sage->pos % 2)
-		ft_usleep(10);
+	{
+		printf_sem(sage, LOG_THINK);
+		ft_usleep(5);
+	}
+	if (sage->pos == sage->args->num && sage->args->num % 2)
+		ft_usleep(5);
 //	printf("taking meal %d\n", sage->pos); //remove me
 	//take one fork
 	//sem_wait_protected(sage->table->gener);
@@ -278,7 +283,7 @@ int take_meal(t_sage *sage)
 	printf_sem(sage, LOG_FORK);
 	if (sage->args->num > 1)
 	{
-		//printf("will you take fork?\n");
+//		printf("will %d take fork? \n", sage->pos);
 		sem_wait_protected(sage->table->sticks);
 		printf_sem(sage, LOG_FORK);
 	}
@@ -289,7 +294,7 @@ int take_meal(t_sage *sage)
 	ft_usleep(sage->args->eat);
 	sem_post_protected(sage->table->sticks);
 	sem_post_protected(sage->table->sticks);
-	printf("End of taking meal %d\n", sage->pos);
+	//printf("End of taking meal %d\n", sage->pos);
 	return (0);
 }
 
@@ -315,13 +320,13 @@ int	routine(void *arg)
 	{
 		take_meal(sage);
 /*		if (take_meal(sage) || continue_dinner(sage->table) == 0)
-			break ;
-		printf_mut(sage, LOG_SLEEP);
+			break ; */
+		printf_sem(sage, LOG_SLEEP);
 		ft_usleep(sage->args->sleep);
-		if (!continue_dinner(sage->table))
-			break ;
-		printf_mut(sage, LOG_THINK);
-*/
+	//	if (!continue_dinner(sage->table))
+		//	break ;
+		printf_sem(sage, LOG_THINK);
+
 	}
 	exit (EXIT_SUCCESS);
 }
@@ -458,7 +463,7 @@ int	make_processes(t_args *args, t_table *table)
 		table->philos[i] = fork();
 		if (table->philos[i] < 0)
 			exit(clean_table_return(table, "fork error", 1));
-		else if (i < args->num && table->philos[i] == 0)
+		else if (table->philos[i] == 0)
 			routine(table->guests[i]);
 	}
 	if (DEBUG_MOD)
@@ -501,16 +506,26 @@ int open_semaphores(t_table *table, t_args *args)
 	sem_unlink(SEM_STICKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_GENER);
+	printf("(unsigned int) args->num)=%d\n", (unsigned int) args->num);
 	table->sticks = sem_open(SEM_STICKS, O_CREAT, 0644, (unsigned int) args->num);
 	if (table->sticks == SEM_FAILED)
 		return (clean_table_return(table, "error sem_open", 1));
 	if (DEBUG_MOD)
 	{
+		/*
+		sem_wait(table->sticks);
+		printf("1st fork is taken\n");
+		sem_wait(table->sticks);
+		printf("2nd fork is taken\n");
+		sem_wait(table->sticks);
+		printf("3rd fork is taken\n");
+		
 		//sem_trywait is not allowed remove this section before submission!
 		if (sem_trywait(table->sticks) == -1)
 			printf("After open semaphore. It is closed\n");
 		else
 			printf("After open semaphore. It is open\n");
+		*/
 	}
 	table->print = sem_open(SEM_PRINT, O_CREAT, 0644, 1);
 	if (table->print == SEM_FAILED)
