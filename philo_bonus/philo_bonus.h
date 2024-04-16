@@ -45,6 +45,7 @@
 # define SEM_STICKS "/sticks"
 # define SEM_PRINT  "/print"
 # define SEM_GENER 	"/gener"
+# define SEM_MEALS 	"/meals"
 
 typedef struct s_args
 {
@@ -64,7 +65,7 @@ typedef struct s_table
 	sem_t			*gener;
 	sem_t			*sticks;
 	sem_t			*meals;
-	//sem_t			**sems;
+//	sem_t			*;
 	int				*forks;
 	pid_t			*philos;
 	struct s_sage	**guests;

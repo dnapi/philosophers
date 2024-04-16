@@ -1,5 +1,7 @@
 #include "philo_bonus.h"
 #include <semaphore.h>
+#include <signal.h>
+#include <stdio.h>
 
 // set_args.c
 int	panic_args(char *msg, int return_value)
@@ -220,61 +222,84 @@ int	printf_sem(t_sage *sage, char *str)
 	return (0);
 }
 
+int	printf_time(t_sage *sage, char *str, size_t time)
+{
+	sem_wait_protected(sage->table->print);
+	printf("%lu %d %s\n", time, sage->pos, str);
+	sem_post_protected(sage->table->print);
+	return (0);
+}
+
 void	set_print_meal(t_sage *sage)
 {
 	sem_wait_protected(sage->table->gener);
 	sage->last_meal = get_current_time();
+	printf_time(sage, LOG_EAT, sage->last_meal);
 	sem_post_protected(sage->table->gener);
+	/*
 	sem_wait_protected(sage->table->print);
 	if (1) //continue_dinner(sage->table))
 		printf("%lu %d %s\n", sage->last_meal, sage->pos, LOG_EAT);
 	sem_post_protected(sage->table->print);
+	*/
 }
 
 void	*monitor(void *arg)
 {
 	t_sage	*sage;
-	//int		pasta_flag;
+	int			i;
 
 	sage = (t_sage *)arg;
-	//pasta_flag = 1;
 	if (DEBUG_MOD)
 		printf("Hi! I am ghost of %d\n", sage->pos);
-	/*
-	while (tab->num_eats)
+	while (1)
 	{
-		pthread_mutex_lock(tab->m_print);
-		pthread_mutex_lock(tab->m_gener);
-		pasta_flag = set_flags(tab);
-		pthread_mutex_unlock(tab->m_print);
-		pthread_mutex_unlock(tab->m_gener);
-		if (pasta_flag == 0)
+		sem_wait_protected(sage->table->gener);
+		i = get_current_time() - sage->last_meal > (size_t)sage->args->die;
+//		printf("i=%d\n", i);
+		if (i)
+		{
+			sem_wait_protected(sage->table->print);
+			printf("%lu %d %s\n", get_current_time(), sage->pos, LOG_DIED);
+//			printf("last meal = %lu, current=%lu, time_die=%d\n", sage->last_meal,get_current_time(),sage->args->die);
+			i = -1;
+			while (++i < sage->args->num * sage->args->max_eat)
+				sem_post_protected(sage->table->meals);
+			if (sage->args->max_eat == -1)
+				sem_post_protected(sage->table->meals);
 			break ;
+		}
+		sem_post_protected(sage->table->gener);
 		ft_usleep(1);
 	}
-	*/
 	return (arg);
 }
 
-int	make_thread(t_sage *sage)
+/*
+int	create_thread(t_sage *sage)
 {
 	if (pthread_create(&(sage->ghost), NULL, &monitor, sage) != 0)
 		return (clean_table_return(sage->table, "error pthread_create", 1));
+	return (0);
+}
+
+int	join_thread(t_sage *sage)
+{
 	if (pthread_join(sage->ghost, NULL) != 0)
 		return (clean_table_return(sage->table, "error pthread_join", 1));
 	return (0);
 }
-
-
+*/
 
 int take_meal(t_sage *sage)
 {
-	if (sage->pos % 2)
+	//printf("take_meal\n");
+	if (sage->args->num > 1 && sage->pos % 2)
 	{
 		printf_sem(sage, LOG_THINK);
 		ft_usleep(5);
 	}
-	if (sage->pos == sage->args->num && sage->args->num % 2)
+	if (sage->args->num > 1 && sage->pos == sage->args->num && sage->args->num % 2)
 		ft_usleep(5);
 //	printf("taking meal %d\n", sage->pos); //remove me
 	//take one fork
@@ -288,12 +313,22 @@ int take_meal(t_sage *sage)
 		printf_sem(sage, LOG_FORK);
 	}
 	else
+	{
+		ft_usleep(sage->args->die);
 		exit (1);
+	}
 	//sem_post_protected(sage->table->gener);
 	set_print_meal(sage);
 	ft_usleep(sage->args->eat);
 	sem_post_protected(sage->table->sticks);
 	sem_post_protected(sage->table->sticks);
+	if (sage->num_eats < sage->args->max_eat)
+	{
+		//sem_wait_protected(sage->table->gener);
+		sage->num_eats++;
+		//sem_wait_protected(sage->table->gener);
+		sem_post_protected(sage->table->meals);
+	}
 	//printf("End of taking meal %d\n", sage->pos);
 	return (0);
 }
@@ -301,33 +336,19 @@ int take_meal(t_sage *sage)
 int	routine(void *arg)
 {
 	t_sage	*sage;
-	int	i;
 
-	//printf("starting routine \n");
 	sage = (t_sage *)arg;
-	if (make_thread(sage))
-		exit (EXIT_FAIL);
-	//ft_usleep(sage->pos);
-//	if (DEBUG_MOD)
-//		printf("Hi! I am %d\n", sage->pos);
-	//set_sticks(sage);
-//	if (sage->pos % 2)
-//		ft_usleep(1);
-//	exit(EXIT_SUCCESS);
-
-	i = -1;
-	while (++i < 5) //continue_dinner(sage->table))
+	if (pthread_create(&(sage->ghost), NULL, &monitor, sage) != 0)
+		exit (clean_table_return(sage->table, "error pthread_create", EXIT_FAIL));
+	while (1) //continue_dinner(sage->table))
 	{
 		take_meal(sage);
-/*		if (take_meal(sage) || continue_dinner(sage->table) == 0)
-			break ; */
 		printf_sem(sage, LOG_SLEEP);
 		ft_usleep(sage->args->sleep);
-	//	if (!continue_dinner(sage->table))
-		//	break ;
 		printf_sem(sage, LOG_THINK);
-
 	}
+	if (pthread_join(sage->ghost, NULL) != 0)
+		exit (clean_table_return(sage->table, "error pthread_join",EXIT_FAIL));
 	exit (EXIT_SUCCESS);
 }
 
@@ -405,11 +426,11 @@ int	init_guests(t_sage **guests, t_table *table)
 			return (1);
 		}
 		guests[i]->pos = 0;
-		guests[i]->num_eats = table->args->max_eat;
+		guests[i]->num_eats = 0;
 		guests[i]->table = table;
 		guests[i]->args = table->args;
 		guests[i]->last_meal = get_current_time();
-		//printf("num i=%d is started at %lu\n", i, guests[i]->last_meal);
+//		printf("num i=%d is started at %lu\n", i, guests[i]->last_meal);
 	}
 	guests[i] = NULL;
 	return (0);
@@ -469,11 +490,26 @@ int	make_processes(t_args *args, t_table *table)
 	if (DEBUG_MOD)
 		printf("Philosophers are now in the process\n");
 	//monitor(table);
-
+	i = -1;
+	while (++i < args->num * args->max_eat)
+	{
+		sem_wait_protected(table->meals);
+//		printf("--- after meals semaphore\n");
+	}
+	if (args->max_eat == -1)
+	{
+		sem_wait_protected(table->meals);
+	//	printf("--- after died Philosophers\n");
+	}
+	i = -1;
+	while (++i < args->num)
+		kill(table->philos[i], SIGTERM);
+	if (DEBUG_MOD)
+		printf("the process after meals semaphore\n");
 	i = -1;
 	while (++i < args->num)
 		waitpid(table->philos[i], &status, 0);
-	printf("main proccess is after waitpid\n");
+	//printf("main proccess is after waitpid\n");
 	return ((status & 0xff00) >> 8);
 }
 /*{
@@ -506,13 +542,14 @@ int open_semaphores(t_table *table, t_args *args)
 	sem_unlink(SEM_STICKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_GENER);
-	printf("(unsigned int) args->num)=%d\n", (unsigned int) args->num);
+	sem_unlink(SEM_MEALS);
+//	printf("(unsigned int) args->num)=%d\n", (unsigned int) args->num);
 	table->sticks = sem_open(SEM_STICKS, O_CREAT, 0644, (unsigned int) args->num);
 	if (table->sticks == SEM_FAILED)
 		return (clean_table_return(table, "error sem_open", 1));
 	if (DEBUG_MOD)
 	{
-		/*
+	/*	
 		sem_wait(table->sticks);
 		printf("1st fork is taken\n");
 		sem_wait(table->sticks);
@@ -533,7 +570,7 @@ int open_semaphores(t_table *table, t_args *args)
 	table->gener = sem_open(SEM_GENER, O_CREAT, 0644, 1);
 	if (table->gener == SEM_FAILED)
 		return (clean_table_return(table, "error sem_open", 1));
-	table->meals = sem_open(SEM_GENER, O_CREAT, 0644, 0);
+	table->meals = sem_open(SEM_MEALS, O_CREAT, 0644, 0);
 	if (table->meals == SEM_FAILED)
 		return (clean_table_return(table, "error sem_open", 1));
 	/*i = -1;
@@ -552,12 +589,14 @@ int close_semaphores(t_table *table)
 	if ( \
 		sem_close(table->sticks) < 0 || \
 		sem_close(table->print) < 0 || \
-		sem_close(table->gener) < 0 )
+		sem_close(table->gener) < 0 || \
+		sem_close(table->meals) < 0 )
 		return (clean_table_return(table, "error sem_close", 1));
 	if ( \
 		sem_unlink(SEM_STICKS) < 0 || \
 		sem_unlink(SEM_PRINT) < 0|| \
-		sem_unlink(SEM_GENER) <0 )
+		sem_unlink(SEM_GENER) < 0|| \
+		sem_unlink(SEM_MEALS) <0 )
 		return (clean_table_return(table, "error sem_unlink", 1));
 	if (DEBUG_MOD)
 		printf("semaphores are closed and unlinked\n");
