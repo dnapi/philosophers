@@ -252,6 +252,7 @@ void	*monitor(void *arg)
 	sage = (t_sage *)arg;
 	if (DEBUG_MOD)
 		printf("Hi! I am ghost of %d\n", sage->pos);
+	printf("Hi! I am ghost of %d\n", sage->pos);
 	while (1)
 	{
 		sem_wait_protected(sage->table->gener);
@@ -293,7 +294,7 @@ int	join_thread(t_sage *sage)
 
 int take_meal(t_sage *sage)
 {
-	//printf("take_meal\n");
+	printf("take_meal\n");
 	if (sage->args->num > 1 && sage->pos % 2)
 	{
 		printf_sem(sage, LOG_THINK);
@@ -494,12 +495,12 @@ int	make_processes(t_args *args, t_table *table)
 	while (++i < args->num * args->max_eat)
 	{
 		sem_wait_protected(table->meals);
-//		printf("--- after meals semaphore\n");
+		printf("--- after meals semaphore\n");
 	}
 	if (args->max_eat == -1)
 	{
 		sem_wait_protected(table->meals);
-	//	printf("--- after died Philosophers\n");
+		printf("--- after died Philosophers\n");
 	}
 	i = -1;
 	while (++i < args->num)

@@ -39,7 +39,7 @@
 # define EXIT_FAIL 2
 
 # define DEBUG_MOD 0
-# define SEM_MOD 0
+# define SEM_MOD 1
 # define NUM_EXTRA_SEM 2
 
 # define SEM_STICKS "/sticks"
