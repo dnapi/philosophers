@@ -3,9 +3,13 @@ NAME = philo_bonus
 SRC =	main_bonus.c \
 		atoil_bonus.c \
 		ft_calloc_bonus.c \
-		time_bonus.c
+		time_bonus.c \
+		set_args_bonus.c \
+		routine_utils_bonus.c \
+		routine_bonus.c \
+		init_free_bonus.c
 
-FLAGS = -Wall -Wextra -Werror #-pthread
+FLAGS = -Wall -Wextra -Werror -pthread
 #FLAGS = -pthread #-fsanitize=thread
 
 OBJ = $(SRC:.c=.o)

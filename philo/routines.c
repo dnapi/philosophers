@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:10:18 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 12:42:14 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/16 16:21:51 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,11 @@
 
 int	take_meal(t_sage *sage)
 {
-	//pthread_mutex_lock(sage->right);
 	lock_right(sage);
 	printf_sem(sage, LOG_FORK);
 	if (sage->args->num > 1)
 	{
 		lock_left(sage);
-//		pthread_mutex_lock(sage->left);
 		printf_sem(sage, LOG_FORK);
 	}
 	else
@@ -29,11 +27,9 @@ int	take_meal(t_sage *sage)
 	set_last_meal(sage);
 	ft_usleep(sage->args->eat);
 	reduce_num_eats(sage);
-	//pthread_mutex_unlock(sage->right);
 	unlock_right(sage);
 	if (sage->args->num > 1)
 		unlock_left(sage);
-//		pthread_mutex_unlock(sage->left);
 	return (0);
 }
 
@@ -55,9 +51,13 @@ void	*routine(void *arg)
 	t_sage	*sage;
 
 	sage = (t_sage *)arg;
+	//sage->last_meal = get_current_time();
 	set_sticks(sage);
 	if (sage->pos % 2)
-		ft_usleep(1);
+	{
+		printf_sem(sage, LOG_THINK);
+		ft_usleep(2);
+	}
 	while (continue_dinner(sage->table))
 	{
 		if (take_meal(sage) || continue_dinner(sage->table) == 0)
@@ -104,6 +104,7 @@ void	*monitor(void *arg)
 
 	tab = (t_table *)arg;
 	pasta_flag = 1;
+	ft_usleep(10);
 	while (tab->num_eats)
 	{
 		pthread_mutex_lock(tab->m_print);

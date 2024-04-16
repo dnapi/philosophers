@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:38:28 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/15 17:16:52 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/16 15:24:20 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 # include <sys/wait.h>
 # include <semaphore.h>
 # include <fcntl.h>
+# include <signal.h>
 
 # define MSG_NAME "phil"
 # define ERRMSG_NUMARG "wrong number of arguments"
@@ -39,7 +40,7 @@
 # define EXIT_FAIL 2
 
 # define DEBUG_MOD 0
-# define SEM_MOD 1
+# define SEM_MOD 0
 # define NUM_EXTRA_SEM 2
 
 # define SEM_STICKS "/sticks"
@@ -65,7 +66,6 @@ typedef struct s_table
 	sem_t			*gener;
 	sem_t			*sticks;
 	sem_t			*meals;
-//	sem_t			*;
 	int				*forks;
 	pid_t			*philos;
 	struct s_sage	**guests;
@@ -80,7 +80,6 @@ typedef struct s_sage
 	t_args		*args;
 	int			pos;
 	pthread_t	ghost;
-	//sem_t		*sem;
 	size_t		last_meal;
 	int			num_eats;
 	//sem_t	*left;
@@ -100,16 +99,10 @@ int		set_args(t_args *args, int argc, char **argv);
 void	print_debug_mode(int flag, t_args *args);
 
 //		routine_utils.c
-void	reduce_num_eats(t_sage *sage);
-void	set_last_meal(t_sage *sage);
-int		continue_dinner(t_table *table);
+void	sem_wait_protected(sem_t *sem);
+void	sem_post_protected(sem_t *sem);
 int		printf_sem(t_sage *sage, char *str);
-
-//		lockers.c
-void	lock_right(t_sage *sage);
-void	unlock_right(t_sage *sage);
-void	lock_left(t_sage *sage);
-void	unlock_left(t_sage *sage);
+int		printf_time(t_sage *sage, char *str, size_t time);
 
 //		routines.c
 int		routine(void *arg);

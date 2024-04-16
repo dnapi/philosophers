@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:06:00 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 06:52:16 by alex             ###   ########.fr       */
+/*   Updated: 2024/04/16 15:32:03 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,24 +35,6 @@ int	make_threads(t_args *args, t_table *table)
 	return (0);
 }
 
-/*
-	i = -1;
-	while (++i < args->num)
-	{
-		table.guests[i]->pos = i + 1;
-		if (pthread_create(table.philos + i, \
-				NULL, &routine, table.guests[i]) != 0)
-			return (clean_table_return(&table, "error pthread_create", 1));
-	}
-	if (pthread_create(table.waiter, NULL, &monitor, &table) != 0)
-		return (clean_table_return(&table, "error pthread_create", 1));
-	i = -1;
-	while (++i < args->num + NUM_EXTRA_THREADS)
-	{
-		if (pthread_join(table.philos[i], NULL) != 0)
-			return (clean_table_return(&table, "error pthread_join", 1));
-	}
-*/
 int	do_dinner(t_args *args)
 {
 	t_table	table;

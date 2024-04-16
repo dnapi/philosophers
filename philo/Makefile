@@ -11,7 +11,7 @@ SRC =	main.c \
 		init_free.c
 
 FLAGS = -Wall -Wextra -Werror -pthread
-#FLAGS = -pthread #-fsanitize=thread
+#FLAGS = -pthread -fsanitize=thread
 
 OBJ = $(SRC:.c=.o)
 
