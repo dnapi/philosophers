@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:10:18 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/16 16:21:51 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/16 17:48:11 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ void	*routine(void *arg)
 	t_sage	*sage;
 
 	sage = (t_sage *)arg;
-	//sage->last_meal = get_current_time();
 	set_sticks(sage);
 	if (sage->pos % 2)
 	{
