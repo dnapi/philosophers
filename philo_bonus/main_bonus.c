@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 15:13:14 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/16 17:25:36 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/16 18:11:12 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,10 @@ int	do_dinner(t_args *args)
 	if (open_semaphores(&table, args))
 		return (1);
 	if (!SEM_MOD && make_processes(args, &table))
-		return (1);
+	{
+		close_semaphores(&table);
+		return (clean_table_return(&table, NULL, 1));
+	}
 	if (close_semaphores(&table))
 		return (1);
 	clean_table_return(&table, NULL, 0);
