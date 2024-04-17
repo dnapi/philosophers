@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 15:15:38 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/16 17:15:47 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/17 08:43:36 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	*monitor(void *arg)
 			break ;
 		}
 		sem_post_protected(sage->table->gener);
-		ft_usleep(10);
+		ft_usleep(1);
 	}
 	return (arg);
 }
