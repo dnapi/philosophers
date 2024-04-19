@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:10:18 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/16 17:48:11 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/17 09:27:28 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	*routine(void *arg)
 
 	sage = (t_sage *)arg;
 	set_sticks(sage);
-	if (sage->pos % 2)
+	if (sage->pos % 2 && sage->args->num > 1)
 	{
 		printf_sem(sage, LOG_THINK);
 		ft_usleep(2);

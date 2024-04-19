@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:38:28 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/16 15:24:20 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/17 09:39:08 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ typedef struct s_table
 	int				*forks;
 	pid_t			*philos;
 	struct s_sage	**guests;
-	int				pasta_flag;
 	int				num_eats;
 	size_t			start_time;
 }	t_table;

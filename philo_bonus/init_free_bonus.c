@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 15:14:27 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/16 15:14:29 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/17 09:38:54 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,6 @@ int	init_guests(t_sage **guests, t_table *table)
 void	set_table(t_table *table, t_args *args)
 {
 	table->args = args;
-	table->pasta_flag = 1;
 	table->num_eats = table->args->max_eat * table->args->num;
 	table->sticks = NULL;
 	table->print = NULL;

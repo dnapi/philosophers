@@ -3,14 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   set_args.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:45:53 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/14 06:46:59 by alex             ###   ########.fr       */
+/*   Updated: 2024/04/17 15:45:25 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+size_t	ft_strlen(const char *s)
+{
+	char	*pnt;
+
+	pnt = (char *)s;
+	while (*pnt)
+		pnt++;
+	return (pnt - s);
+}
 
 int	panic_args(char *msg, int return_value)
 {
@@ -29,6 +39,8 @@ int	check_args(int argc, char **argv)
 	while (++i < argc)
 	{
 		s = argv[i];
+		if (ft_strlen(s) > 7)
+			return (panic_args(ERRMSG_INT, 1));
 		while (*s)
 		{
 			if (*s < '0' || '9' < *s)
@@ -46,20 +58,20 @@ int	set_args(t_args *args, int argc, char **argv)
 	args->argc = argc;
 	args->table = NULL;
 	args->num = ft_atoil(argv[1]);
-	if (args->num < 1)
+	if (args->num < 1 || args->num > 200)
 		return (panic_args(ERRMSG_NUMPHIL, 1));
 	args->die = ft_atoil(argv[2]);
-	if (args->die < 1)
+	if (args->die < 1 || args->die > MAX_TIME)
 		return (panic_args(ERRMSG_TIMEDIE, 1));
 	args->eat = ft_atoil(argv[3]);
-	if (args->eat < 1)
+	if (args->eat < 1 || args->eat > MAX_TIME)
 		return (panic_args(ERRMSG_TIMEEAT, 1));
 	args->sleep = ft_atoil(argv[4]);
-	if (args->sleep < 1)
+	if (args->sleep < 1 || args->sleep > MAX_TIME)
 		return (panic_args(ERRMSG_TIMESLE, 1));
 	if (argc == 6)
 		args->max_eat = ft_atoil(argv[5]);
-	if (argc == 6 && args->max_eat <= 0)
+	if (argc == 6 && (args->max_eat <= 0 || args->max_eat > MAX_EAT_NUM))
 		return (panic_args(ERRMSG_TIMEEAT, 1));
 	if (argc == 5)
 		args->max_eat = -1;
