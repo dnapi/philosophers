@@ -6,7 +6,7 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:38:28 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/17 09:39:08 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:23:32 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@
 
 # define MSG_NAME "phil"
 # define ERRMSG_NUMARG "wrong number of arguments"
-# define ERRMSG_INT "arguments must be positive integers"
-# define ERRMSG_NUMPHIL "number of philosofers must put positive"
-# define ERRMSG_TIMEDIE "time to die must put positive"
-# define ERRMSG_TIMEEAT "time to eat must put positive"
-# define ERRMSG_TIMESLE "time to sleep must put positive"
-# define ERRMSG_MAXEAT "max number of eats must put positive"
+# define ERRMSG_INT "arguments must be positive integers and less then 8 digits"
+# define ERRMSG_NUMPHIL "number of philosofers must put positive and less 201"
+# define ERRMSG_TIMEDIE "time to die must put positive and less then hour"
+# define ERRMSG_TIMEEAT "time to eat must put positive and less then hour"
+# define ERRMSG_TIMESLE "time to sleep must put positive and less then hour"
+# define ERRMSG_MAXEAT "max number of eats must put positive and less 60000"
 # define LOG_FORK "has taken a fork"
 # define LOG_EAT "is eating"
 # define LOG_SLEEP "is sleeping"

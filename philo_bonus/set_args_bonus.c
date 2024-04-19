@@ -6,11 +6,21 @@
 /*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 15:17:46 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/16 15:17:50 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/19 12:26:22 by apimikov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo_bonus.h"
+
+size_t	ft_strlen(const char *s)
+{
+	char	*pnt;
+
+	pnt = (char *)s;
+	while (*pnt)
+		pnt++;
+	return (pnt - s);
+}
 
 int	panic_args(char *msg, int return_value)
 {
@@ -29,6 +39,8 @@ int	check_args(int argc, char **argv)
 	while (++i < argc)
 	{
 		s = argv[i];
+		if (ft_strlen(s) > 7)
+			return (panic_args(ERRMSG_INT, 1));
 		while (*s)
 		{
 			if (*s < '0' || '9' < *s)
