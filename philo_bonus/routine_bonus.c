@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routine_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/16 15:15:38 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/17 08:43:36 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/20 21:34:52 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	*monitor(void *arg)
 	int		i;
 
 	sage = (t_sage *)arg;
-	ft_usleep(30);
+	ft_usleep(20);
 	while (1)
 	{
 		sem_wait_protected(sage->table->gener);
@@ -50,6 +50,7 @@ void	*monitor(void *arg)
 
 int	take_meal(t_sage *sage)
 {
+	sem_wait_protected(sage->table->gener);
 	sem_wait_protected(sage->table->sticks);
 	printf_sem(sage, LOG_FORK);
 	if (sage->args->num > 1)
@@ -62,15 +63,18 @@ int	take_meal(t_sage *sage)
 		ft_usleep(sage->args->die * 2);
 		return (0);
 	}
+	sem_post_protected(sage->table->gener);
 	set_print_meal(sage);
 	ft_usleep(sage->args->eat);
 	sem_post_protected(sage->table->sticks);
 	sem_post_protected(sage->table->sticks);
+	sem_wait_protected(sage->table->gener);
 	if (sage->num_eats < sage->args->max_eat)
 	{
 		sage->num_eats++;
 		sem_post_protected(sage->table->meals);
 	}
+	sem_post_protected(sage->table->gener);
 	return (0);
 }
 
@@ -85,12 +89,12 @@ int	routine(void *arg)
 	if (sage->args->num > 1 && sage->pos % 2)
 	{
 		printf_sem(sage, LOG_THINK);
-		ft_usleep(50);
+		ft_usleep(10);
 	}
 	if (sage->args->num > 1 && \
 		sage->pos == sage->args->num && \
 		sage->args->num % 2)
-		ft_usleep(50);
+		ft_usleep(10);
 	while (1)
 	{
 		take_meal(sage);

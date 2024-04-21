@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   routines.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: apimikov <apimikov@student.42.fr>          +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/04/14 06:10:18 by apimikov          #+#    #+#             */
-/*   Updated: 2024/04/17 09:27:28 by apimikov         ###   ########.fr       */
+/*   Updated: 2024/04/20 20:44:36 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,8 @@ void	*monitor(void *arg)
 		pthread_mutex_lock(tab->m_print);
 		pthread_mutex_lock(tab->m_gener);
 		pasta_flag = set_flags(tab);
-		pthread_mutex_unlock(tab->m_print);
 		pthread_mutex_unlock(tab->m_gener);
+		pthread_mutex_unlock(tab->m_print);
 		if (pasta_flag == 0)
 			break ;
 		ft_usleep(1);

@@ -9,8 +9,9 @@ SRC =	main_bonus.c \
 		routine_bonus.c \
 		init_free_bonus.c
 
-FLAGS = -Wall -Wextra -Werror #-pthread
+#FLAGS = -Wall -Wextra -Werror -pthread
 #FLAGS = -Wall -Wextra -Werror -pthread -fsanitize=thread
+FLAGS = -Wall -Wextra -Werror
 #FLAGS = -pthread #-fsanitize=thread
 
 OBJ = $(SRC:.c=.o)
